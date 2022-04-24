@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class welcomeController {
 
     @GetMapping
-    public String welcome(){
-        return "welcome to springboot restapi";
+    public String welcome(String name){
+        return String.format("welcome, %s", name);
     } 
 }
