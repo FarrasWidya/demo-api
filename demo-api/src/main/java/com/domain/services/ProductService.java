@@ -13,6 +13,7 @@ import com.domain.DTO.ResponseData;
 import com.domain.models.entity.Product;
 import com.domain.models.repos.ProductRepo;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import org.springframework.validation.ObjectError;
 
 @Service
 @Transactional
-
+@Slf4j
 
 public  class ProductService {
     private final ProductRepo productRepo;
@@ -38,7 +39,7 @@ public  class ProductService {
 
         if(errors.hasErrors()){
             for (ObjectError error : errors.getAllErrors()) {
-                responseData.setMessage(error.getDefaultMessage());
+                log.info(error.getDefaultMessage());
             }
             responseData.setStatus(Boolean.FALSE);
             responseData.setMessage("FAILED");
@@ -48,7 +49,7 @@ public  class ProductService {
         responseData.setStatus(Boolean.TRUE);
         responseData.setMessage("SUCCESS");
         responseData.setResult(newProduct);
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
 
     public ResponseEntity<BaseResponse> find(Long id){
@@ -96,9 +97,9 @@ public  class ProductService {
         return ResponseEntity.ok(response);
     }
 
-    public List<Product> findByName(String name){
-        return productRepo.findByNameContains(name);
-    }
+//    public List<Product> findByName(String name){
+//        return productRepo.findByNameContains(name);
+//    }
 
     public ResponseEntity<BaseResponse<Product>> update(Product productUpdate, Errors errors){
         Product updatedProduct = productRepo.save(productUpdate);
@@ -107,13 +108,15 @@ public  class ProductService {
 
         if(errors.hasErrors()){
             for (ObjectError error : errors.getAllErrors()) {
-                responseData.setMessage(error.getDefaultMessage());
+                log.info(error.getDefaultMessage());
             }
             responseData.setStatus(false);
+            responseData.setMessage("FAILED");
             responseData.setResult(null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
         responseData.setStatus(true);
+        responseData.setMessage("SUCCESS");
         responseData.setResult(updatedProduct);
         return ResponseEntity.ok(responseData);
     }
